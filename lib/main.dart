@@ -1,7 +1,6 @@
+import 'package:chatterbox_firebase/screens/HomeScreen.dart';
 import 'package:chatterbox_firebase/shared/Constants.dart';
 import 'package:flutter/material.dart';
-
-import 'screens/auth/LoginScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Constants().primaryColor,
           scaffoldBackgroundColor: Colors.white),
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: const HomeScreen(),
     );
   }
 }
