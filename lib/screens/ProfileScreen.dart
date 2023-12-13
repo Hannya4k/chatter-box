@@ -1,7 +1,10 @@
 import 'package:chatterbox_firebase/screens/HomeScreen.dart';
+import 'package:chatterbox_firebase/screens/auth/LoginScreen.dart';
+import 'package:chatterbox_firebase/service/auth_service.dart';
 import 'package:chatterbox_firebase/widgets/Widgets.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ProfileScreen extends StatefulWidget {
   String userName;
   String email;
@@ -13,6 +16,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  AuthService authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +69,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () async {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Logout"),
+                        content: const Text("Are you sure you want to logout?"),
+                        actions: [
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                              )),
+                          IconButton(
+                              onPressed: () async {
+                                await authService.signOut();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                    (route) => false);
+                              },
+                              icon: const Icon(
+                                Icons.done,
+                                color: Colors.green,
+                              ))
+                        ],
+                      );
+                    });
+              },
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               leading: const Icon(Icons.exit_to_app),
