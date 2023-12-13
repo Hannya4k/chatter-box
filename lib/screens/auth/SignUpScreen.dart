@@ -1,4 +1,7 @@
+import 'package:chatterbox_firebase/helper/helper_function.dart';
+import 'package:chatterbox_firebase/screens/HomeScreen.dart';
 import 'package:chatterbox_firebase/screens/auth/LoginScreen.dart';
+import 'package:chatterbox_firebase/service/auth_service.dart';
 import 'package:chatterbox_firebase/widgets/Widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,15 +14,17 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  bool _isLoading = false;
   final formKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
-  String fullname = "";
+  String fullName = "";
+  AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: _isLoading ? Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor)) : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
           child: Form(
@@ -46,11 +51,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       )),
                   onChanged: (val) {
                     setState(() {
-                      fullname = val;
+                      fullName = val;
                     });
                   },
                   validator: (val) {
-                    if (val!.isEmpty) {
+                    if (val!.isNotEmpty) {
                       return null;
                     } else {
                       return "name cannot be empty";
@@ -146,7 +151,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  SignUp() {
-    if (formKey.currentState!.validate()) {}
+  SignUp() async{
+    if (formKey.currentState!.validate()) {
+      setState(() {
+         _isLoading = true;
+      });
+      await authService
+      .registerUserWithEmailandPassword(fullName, email, password)
+      .then((value)async{
+        if(value == true){
+          //saving the shared prefrenced state
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          await HelperFunctions.saveUserEmailSF(email);
+          await HelperFunctions.saveUserNameSF(fullName);
+          nextScreenReplace(context, const HomeScreen());
+        } else{
+          showSnackBar(context, Colors.red,value) ;
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
+    }
   }
 }
