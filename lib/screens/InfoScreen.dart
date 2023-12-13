@@ -1,4 +1,6 @@
+import 'package:chatterbox_firebase/screens/HomeScreen.dart';
 import 'package:chatterbox_firebase/service/database_service.dart';
+import 'package:chatterbox_firebase/widgets/Widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +55,48 @@ class _InfoScreenState extends State<InfoScreen> {
         backgroundColor: Theme.of(context).primaryColor,
         title: const Text("Group Info"),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.exit_to_app))
+          IconButton(onPressed: () {
+                            showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Exit"),
+                        content:
+                            const Text("Are you sure you exit the group? "),
+                        actions: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              DatabaseService(
+                                      uid: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .toggleGroupjoin(
+                                      widget.groupId,
+                                      getName(widget.adminName),
+                                      widget.groupName)
+                                  .whenComplete(() {
+                                nextScreenReplace(context, const HomeScreen());
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.done,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      );
+                    });
+              },
+          icon: const Icon(Icons.exit_to_app))
         ],
       ),
       body: Container(
