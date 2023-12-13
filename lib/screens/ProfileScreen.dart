@@ -1,39 +1,29 @@
-import 'package:chatterbox_firebase/screens/ProfileScreen.dart';
-import 'package:chatterbox_firebase/screens/SearchScreen.dart';
+import 'package:chatterbox_firebase/screens/HomeScreen.dart';
 import 'package:chatterbox_firebase/widgets/Widgets.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  String userName;
+  String email;
+  ProfileScreen({Key? key, required this.email, required this.userName})
+      : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  String userName = "";
-  String email = "";
-
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: () {
-                nextScreen(context, const SearchScreen());
-              },
-              icon: const Icon(
-                Icons.search,
-              )),
-        ],
-        centerTitle: true,
-        elevation: 0,
         backgroundColor: Theme.of(context).primaryColor,
+        elevation: 0,
+        centerTitle: true,
         title: const Text(
-          "ChatterBox",
+          "Profile",
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 27),
+              color: Colors.white, fontSize: 27, fontWeight: FontWeight.bold),
         ),
       ),
       drawer: Drawer(
@@ -43,16 +33,16 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(Icons.account_circle, size: 150, color: Colors.grey[700]),
             const SizedBox(height: 15),
             Text(
-              userName,
+              widget.userName,
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
             const Divider(height: 2),
             ListTile(
-              onTap: () {},
-              selectedColor: Theme.of(context).primaryColor,
-              selected: true,
+              onTap: () {
+                nextScreen(context, const HomeScreen());
+              },
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               leading: const Icon(Icons.group),
@@ -62,10 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
-              onTap: () {
-                nextScreenReplace(
-                    context, ProfileScreen(userName: userName, email: email));
-              },
+              onTap: () {},
+              selectedColor: Theme.of(context).primaryColor,
+              selected: true,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               leading: const Icon(Icons.group),
@@ -87,18 +76,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: groupList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          popUpDialog(context);
-        },
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
-        child: const Icon(Icons.add, color: Colors.white, size: 30),
-      ),
+      body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 170),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.account_circle,
+                size: 200,
+                color: Colors.grey[700],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Full Name:", style: TextStyle(fontSize: 17)),
+                  Text(widget.userName, style: const TextStyle(fontSize: 17)),
+                ],
+              ),
+              const Divider(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Email:", style: TextStyle(fontSize: 17)),
+                  Text(widget.email, style: const TextStyle(fontSize: 17)),
+                ],
+              )
+            ],
+          )),
     );
   }
-
-  popUpDialog(BuildContext context) {}
-  groupList() {}
 }
