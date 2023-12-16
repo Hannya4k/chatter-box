@@ -1,5 +1,11 @@
+import 'package:chatterbox_firebase/helper/helper_function.dart';
+import 'package:chatterbox_firebase/screens/HomeScreen.dart';
 import 'package:chatterbox_firebase/screens/auth/SignUpScreen.dart';
+import 'package:chatterbox_firebase/service/auth_service.dart';
+import 'package:chatterbox_firebase/service/database_service.dart';
 import 'package:chatterbox_firebase/widgets/Widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -14,10 +20,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
+  bool _isLoading = false;
+  AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: _isLoading ? Center(child:CircularProgressIndicator(color: Theme.of(context).primaryColor),): SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
           child: Form(
@@ -123,7 +131,30 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Login() {
-    if (formKey.currentState!.validate()) {}
+  Login() async{
+    if (formKey.currentState!.validate()) {
+      setState(() {
+         _isLoading = true;
+      });
+      await authService
+      .loginWithEmailandPassword(email, password)
+      .then((value)async{
+        if(value == true){
+          QuerySnapshot snapshot =  
+          await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid).gettingUserData(email);
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          await HelperFunctions.saveUserEmailSF(email);
+          await HelperFunctions.saveUserNameSF(
+            snapshot.docs[0]['fullName']
+          );
+          nextScreenReplace(context, const HomeScreen());
+        } else{
+          showSnackBar(context, Colors.red,value) ;
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
+    }
   }
 }
